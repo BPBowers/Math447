@@ -1,0 +1,23 @@
+#include "crypto.h"
+#include <iostream>
+#include <cstdio>
+#include <string>
+
+int main()
+{
+    //Miller Rabin function found on the buttom of homework4 class :)
+    homework4 crypto;
+    string t1 = "7849320745092875923486518746897436504752587";
+    InfInt test1 = t1;
+    string t2 = "22439979015817429464453212582447889544084770603331770046950768541515493";
+    InfInt test2 = t2;
+    string t3 = "67896375048456578490852086705286724507634897563894658714169752875923486518746897436504752807";
+    InfInt test3  = t3;
+    string t4 = "7083387173976100946763005874138341859212076191416918191389884735307723848374461229436834907695854745003486953411841280531221745747218536839402506751247715594253113";
+    InfInt test4 = t4;
+    crypto.milRab(test1, 30);
+    crypto.milRab(test2, 30);
+    crypto.milRab(test3, 30);
+    crypto.milRab(test4, 30);
+    return 0;
+}
