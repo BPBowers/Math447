@@ -13,9 +13,15 @@ using namespace std;
 class KnuthFunc
 {
     private:
-        string ciphertext;
+        //Resets the position of the In File Stream to 0 and removes the EOF flag with clear
+        void streamReset(ifstream& s)
+        {
+            s.clear();
+            s.seekg(0);
+        }
+
         //Tests
-        //This one is ging to be very painful to program :(
+        //Determines the correlation coefficent, aka how much the previous number depends on the previous
         float serialCorrTest(ifstream& s)
         {
             int X0, Xj, Xji;
@@ -43,6 +49,7 @@ class KnuthFunc
             long pt1 = (numer - subtractor);
             long pt2 = (denom - subtractor);
             float coeff = (float)pt1/(float)pt2;
+            streamReset(s);
             return coeff;
         }
         //Not the knuth version but I am taking the average of the difference between xj and xj1
@@ -58,6 +65,7 @@ class KnuthFunc
                 Xj = Xj1;
             }
             float avg = (float)gap/(float)count;
+            streamReset(ciphertxt);
             return avg;
         }
         bool gapTest(){
@@ -72,27 +80,11 @@ class KnuthFunc
             int runLength = 1;
             int numRuns = 0;
             int Xj, Xj1;
-            int oneRun = 0;
-            int twoRun = 0;
-            int threeRun = 0; 
-            int fourRun = 0; 
-            int bigRun = 0;
             int avgl = 0;
             int n;//Length of ciphertext aka sequence
             ciphertxt >> Xj;
             while(ciphertxt >> Xj1){
                 if (Xj > Xj1){
-                    //Will edit this ugly if statement tower
-                    if(runLength == 1)
-                        oneRun++;
-                    else if(runLength == 2)
-                        twoRun++;
-                    else if(runLength == 3)
-                        threeRun++;
-                    else if(runLength == 4)
-                        fourRun++;
-                    else
-                        bigRun++;
                     numRuns++;
                     avgl += runLength;
                     runLength = 1;
@@ -105,7 +97,7 @@ class KnuthFunc
                 n++;
             }
             printf("Number of Up Runs are %d\nAverage Run Length was %f\n", numRuns, ((float)avgl/(float)numRuns));
-            //printf("One Length Runs: %d\nTwo Length Runs: %d\nThree Length Runs: %d\nFour Length Runs: %d\nFive and Above Length Runs: %d\n", oneRun, twoRun, threeRun, fourRun, bigRun);
+            streamReset(ciphertxt);
             return true;
         }
 
@@ -114,28 +106,11 @@ class KnuthFunc
             int runLength = 1;
             int numRuns = 0;
             int Xj, Xj1;
-            int oneRun = 0;
-            int twoRun = 0;
-            int threeRun = 0; 
-            int fourRun = 0; 
-            int bigRun = 0;
             int avgl = 0;
             int n;//Length of ciphertext aka sequence
             ciphertxt >> Xj;
             while(ciphertxt >> Xj1){
                 if (Xj < Xj1){
-                    //Will edit this ugly if statement tower
-                    //printf("In down");
-                    if(runLength == 1)
-                        oneRun++;
-                    else if(runLength == 2)
-                        twoRun++;
-                    else if(runLength == 3)
-                        threeRun++;
-                    else if(runLength == 4)
-                        fourRun++;
-                    else
-                        bigRun++;
                     numRuns++;
                     avgl += runLength;
                     runLength = 1;
@@ -148,40 +123,71 @@ class KnuthFunc
                 n++;
             }
             printf("Number of Down Runs are %d\nAverage Run Length was %f\n", numRuns, ((float)avgl/(float)numRuns));
-            //printf("One Length Runs: %d\nTwo Length Runs: %d\nThree Length Runs: %d\nFour Length Runs: %d\nFive and Above Length Runs: %d\n", oneRun, twoRun, threeRun, fourRun, bigRun);
+            streamReset(ciphertxt);
             return true;
         }
 
+        //Solid chance that I am not going to do this one
         bool subSequenceTest()
         {
             return true;
         }
 
-    public:
-        //Setter for the value of the ciphertext
-        void setCiphertext(string ct)
+        //Dr. Hammer used something like this to find the distribution of integers when reduced by mod 26,
+        //So not a bad idea to do the same on mine but get the average for that distribution.
+        float modReducTest(ifstream& s, int m)
         {
-            ciphertext = ct;
+            int x;
+            int n = 0;
+            float avg = 0;
+            //s >> Xj;
+            while(s >> x){
+                avg += (x%m);
+                //printf("%d ", (x%m));
+                n++;
+            }
+            avg/=(float)n;
+            streamReset(s);
+            return avg;
         }
 
+        void digitFrequencyTest(ifstream& s)
+        {
+            int digitArr[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            int x, a, g;
+            float avg = 0;
+            int n = 0;
+            while(s >> x){
+                a = x;
+                for(int i = 0; i < ((int)log10(x)+1); i++){
+                    g = a%10;
+                    digitArr[g]++;
+                    avg += g;
+                    //a -= g;
+                    if (a!=0)
+                        a /= 10;
+                    n++;
+                }
+            }
+            //print array
+            for(int i = 0; i < 9; i++)
+                printf("Number of %ds are %d\n", i, digitArr[i]);
+            printf("Average Digit is %f\n", (avg/(float)n));
+            streamReset(s);
+        }
+
+    public:
         //Runs all the tests and prints the results of each
         bool testValidity(ifstream &s){
             bool uRun = runUpTest(s);
-            s.clear();
-            s.seekg(0);
             bool dRun = runDownTest(s);
-            s.clear();
-            s.seekg(0);
             float dgap = avgDifTest(s);
             printf("Average Gap between numbers is %f\n", dgap);
-            s.clear();
-            s.seekg(0);
             float corrCoef = serialCorrTest(s);
             printf("Correlation Coefficient is %f\n", corrCoef);
-            //if (uRun, dRun)
-            //    return true;
-            //else
-            //    return false;
+            float modRed = modReducTest(s, 26);
+            printf("Average Mod Reduction value is %f\n", modRed);
+            digitFrequencyTest(s);
             return true;
         }
 };
