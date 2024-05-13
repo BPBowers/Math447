@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>//File stream
 #include "knuth.h"
+#include <SFML/Graphics.hpp>
 
 using namespace std;
 
@@ -18,7 +19,30 @@ int main(){
     printf("---------------\n");
     ifstream c3("CipherTexts/BealeC3.txt");
     knuth.testValidity(c3);
-    //First test, run test
     
+    /*
+    //After Tests Run, open SFML window
+    sf::RenderWindow window(sf::VideoMode(200, 200), "Graph Display");
+    sf::CircleShape shape(33.f);
+    //sf::Vector2f theSize(50, 50);
+    //sf::RectangleShape shape(theSize);
+    
+    //shape.move(1,0);
+    shape.setFillColor(sf::Color::Red);
+    shape.setPosition(0, (window.getSize().y/4));
+    while (window.isOpen())
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+        
+        window.clear();
+        window.draw(shape);
+        window.display();
+    }
+    */
 }
 

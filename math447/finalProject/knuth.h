@@ -20,6 +20,99 @@ class KnuthFunc
             s.seekg(0);
         }
 
+        //Komlmogorov-Smirnov Test
+        bool ksTest(ifstream& s, int n)
+        {
+            float d, dCan, dAlpha;
+            int temp;
+            int arr[n];
+            //1.)Sort list in assending order
+            for(int i = 0; s >> temp; i++)
+                arr[i] = temp;
+            for(int i = 0; i < n; i++){
+                for(int j = 0; j < n - i - 1; j++){
+                    if(arr[j] > arr[j + 1]){
+                        temp = arr[j];
+                        arr[j] = arr[j + 1];
+                        arr[j + 1] = temp;
+                    }
+                }
+            }
+
+            //2.) Compute d+ = max{(1/n)-arr[i]}
+            float dPlus = 0;
+            for(int i = 0; i < n; i++){
+                dCan = ((i+1)/n)-arr[i];
+                if (dCan > dPlus)
+                    dPlus = dCan;//dPlus become the cannidate
+            }
+            //3.) Compute d- = max{arr[i]-(i-1)/n}
+            float dMinus = 0;
+            for(int i = 0; i < n; i++){
+                dCan = arr[i] - ((i-1)/n);
+                if (dCan > dMinus)
+                    dPlus = dCan;//dPlus become the cannidate
+            }
+            //4.) d is the maximum between dMinus and dPlus
+            d = max(dPlus, dMinus);
+            //5.) Alpha is hard coded at 0.05, dAlpha is gained from the KST characteristic table, buut 
+            dAlpha = (1.35810/(float)sqrt(n));
+            streamReset(s);
+            if (d < dAlpha)
+                return true;//True meaning random
+            else
+                return false;//False meaning not random
+        }
+
+        //Values of arr will be compared against expected outcome
+        //k is the number of possible buckets each result can become
+        //dataPool is the total entries that were used to create a decent prediction value
+        //mode determines if the chi Square will be used with English Language Frequencies or posses an equal distribution of 1/k
+        bool chiSquare(int* arr, int k, float dataPool, int mode)
+        {
+            //Only using values from the 0.05 percentage column, and only up to degree of freedom 30
+            float chiTable[] = {3.841, 5.991, 7.815, 9.488, 11.070, 12.592, 14.067, 15.507, 16.919, 18.307,
+                              19.675, 21.026, 22.362, 23.685, 24.996, 26.296, 27.587, 28.869, 30.144, 31.410,
+                               32.671, 33.924, 35.172, 36.415, 37.652, 38.885, 40.113, 41.337, 42.557, 43.773};
+            //I guess we assuming n = 26
+            float letterFrequency[] = {8.4966, 2.0720, 4.5388, 3.3844, 11.1607, 1.8121, 2.4705, 3.0034, 7.5448,
+                                       0.1965, 1.1016, 5.4893, 3.0129, 6.6544, 7.1635, 3.1671, 0.1962, 7.5809,
+                                       5.7351, 6.9509, 3.6308, 1.0074, 1.2899, 0.2902, 1.7779, 0.2722};
+            float p[k];
+            for (int i = 0; i < k; i++){
+                p[i] = 0;
+            }
+            //(i+x)%26
+            float temp;
+            for (int x = 0; x < ((k-1)*mode)+1; x++){
+                for(int i = 0; i < k; i++){
+                    if (mode == 1)
+                        temp = letterFrequency[((i+x)%k)]/100;
+                    else
+                        temp = (1/(float)k);
+                    p[i] = dataPool*temp;
+                    //printf("np %f\n", p[i]);
+                }
+                float value = 0;
+                
+                //value = ((O-np)^2)/np + all other posibilities
+                for(int i = 0; i < k; i++){
+                    value += ((float)(arr[i] - p[i]))*(arr[i] - p[i])/(p[i]);
+                    //value += ((float)pow(arr[i], 2)/(letterFrequency[i]/100))-(float)dataPool;
+                    //printf("This is value %f\n", value);
+                    //printf("This is arr %d\n", arr[i]);
+
+                }
+                //value *= (1/(float)dataPool);
+                //printf("This is value %f\n This is chiTable %f\n", value, chiTable[n-2]);
+                if(value <= chiTable[k-2])//Degree of freedom is n-1, but -2 b.c. arrays start at index 0 duh
+                    return true;
+                else
+                    continue;
+            }
+            return false;
+        }
+
         //Tests
         //Determines the correlation coefficent, aka how much the previous number depends on the previous
         float serialCorrTest(ifstream& s)
@@ -71,8 +164,11 @@ class KnuthFunc
         bool gapTest(){
             return true;
         }
+
         //Knuth page 66
-        bool runUpTest(ifstream& ciphertxt)
+        //Only using the beginning part of the algorithm to get the number of runs, 
+        //might also modify to return an array of the run amounts for up && down
+        int runUpTest(ifstream& ciphertxt)
         {
             //Whenever Xj > Xj+1, seperate the sequence from the rest and get
             //The length of the run i.e. 1 2 3 4 2 8 7 would be
@@ -98,9 +194,9 @@ class KnuthFunc
             }
             printf("Number of Up Runs are %d\nAverage Run Length was %f\n", numRuns, ((float)avgl/(float)numRuns));
             streamReset(ciphertxt);
-            return true;
+            return n;
         }
-
+        //Same desc as above
         bool runDownTest(ifstream& ciphertxt)
         {
             int runLength = 1;
@@ -135,22 +231,36 @@ class KnuthFunc
 
         //Dr. Hammer used something like this to find the distribution of integers when reduced by mod 26,
         //So not a bad idea to do the same on mine but get the average for that distribution.
+        //Need to modify
         float modReducTest(ifstream& s, int m)
         {
             int x;
             int n = 0;
             float avg = 0;
+            int arr[m];
+            for (int i = 0; i < m; i++)
+                arr[i] = 0;
             //s >> Xj;
             while(s >> x){
-                avg += (x%m);
+                int temp = (x%m);
+                arr[temp]++;
+                avg += (temp);
                 //printf("%d ", (x%m));
                 n++;
             }
             avg/=(float)n;
             streamReset(s);
+
+            //for(int i = 0; i < m; i++)
+            //    printf(" %d ", arr[i]);
+            //Now chiSquare time
+
+            bool result = chiSquare(arr, m, n, 0);
+            bool result2 = chiSquare(arr, m, n, 1);
+            printf("Chi-Square even distribution: %d\nChi-Square English Language distribution: %d\n", result, result2);
             return avg;
         }
-
+        //Right keeps track of how many times each digit appears on a ciphertext and also prints average digit.
         void digitFrequencyTest(ifstream& s)
         {
             int digitArr[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -163,13 +273,12 @@ class KnuthFunc
                     g = a%10;
                     digitArr[g]++;
                     avg += g;
-                    //a -= g;
                     if (a!=0)
                         a /= 10;
                     n++;
                 }
             }
-            //print array
+            //print array loop
             for(int i = 0; i < 9; i++)
                 printf("Number of %ds are %d\n", i, digitArr[i]);
             printf("Average Digit is %f\n", (avg/(float)n));
@@ -179,15 +288,19 @@ class KnuthFunc
     public:
         //Runs all the tests and prints the results of each
         bool testValidity(ifstream &s){
-            bool uRun = runUpTest(s);
+            //bool uRun = runUpTest(s);
+            int n = runUpTest(s);
             bool dRun = runDownTest(s);
             float dgap = avgDifTest(s);
             printf("Average Gap between numbers is %f\n", dgap);
             float corrCoef = serialCorrTest(s);
             printf("Correlation Coefficient is %f\n", corrCoef);
+            
             float modRed = modReducTest(s, 26);
             printf("Average Mod Reduction value is %f\n", modRed);
-            digitFrequencyTest(s);
+            //digitFrequencyTest(s);
+            bool ksRes = ksTest(s, n);
+            printf("ksTest pass = %d\n", ksRes);
             return true;
         }
 };
