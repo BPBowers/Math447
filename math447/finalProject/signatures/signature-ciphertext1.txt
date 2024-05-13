@@ -1,0 +1,20 @@
+Number of Up Runs are 41
+Average Run Length was 1.80488
+Number of Down Runs are 41
+Average Run Length was 1.78049
+Average Gap between numbers is 937.947
+Correlation Coefficient is -0.00229632
+Chi-Square even distribution: 0
+Chi-Square English Language distribution: 0
+Average Mod Reduction value is 12.4522
+Number of 0s are 27
+Number of 1s are 39
+Number of 2s are 41
+Number of 3s are 32
+Number of 4s are 26
+Number of 5s are 44
+Number of 6s are 40
+Number of 7s are 35
+Number of 8s are 29
+Average Digit is 4.5072
+ksTest pass = 0

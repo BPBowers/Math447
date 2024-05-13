@@ -20,6 +20,23 @@ class KnuthFunc
             s.seekg(0);
         }
 
+        //Autocorrelation Test
+        //Computation of autocorrelation between every m numbers (m known as lag) starting with ith number
+        //Autocorrelation R[i], R[i+m], R[i+2m], 
+        //M is largest Integer s.t. i+(M+1)m <= N (max number)
+        //Non zero autocor implies lack of dependence so following detailed test
+        //Weird part: zetaNot = Row/Sigma;
+        //zetaNot is a uniform distribution table
+        //Row[im] = (1/M+1)*(Sum R[i+Km]*R[i+(K+1)m])-0.25
+        //Sigma = sqrt(13M+7/12(M+1))
+        //if zeta less than accept, more reject
+        void autoCorTest(ifstream&s)
+        {
+            //
+            streamReset(s);
+        }
+
+
         //Komlmogorov-Smirnov Test
         bool ksTest(ifstream& s, int n)
         {
@@ -168,7 +185,7 @@ class KnuthFunc
         //Knuth page 66
         //Only using the beginning part of the algorithm to get the number of runs, 
         //might also modify to return an array of the run amounts for up && down
-        int runUpTest(ifstream& ciphertxt)
+        int runUpTest(ifstream& ciphertxt, ofstream& out)
         {
             //Whenever Xj > Xj+1, seperate the sequence from the rest and get
             //The length of the run i.e. 1 2 3 4 2 8 7 would be
@@ -190,14 +207,16 @@ class KnuthFunc
                     runLength++;
                     Xj = Xj1;
                 }
+                //Xj = Xj1;
                 n++;
             }
-            printf("Number of Up Runs are %d\nAverage Run Length was %f\n", numRuns, ((float)avgl/(float)numRuns));
+            //printf("Number of Up Runs are %d\nAverage Run Length was %f\n", numRuns, ((float)avgl/(float)numRuns));
+            out << "Number of Up Runs are "<< numRuns << "\nAverage Run Length was " << ((float)avgl/(float)numRuns) << "\n";
             streamReset(ciphertxt);
             return n;
         }
         //Same desc as above
-        bool runDownTest(ifstream& ciphertxt)
+        bool runDownTest(ifstream& ciphertxt, ofstream& out)
         {
             int runLength = 1;
             int numRuns = 0;
@@ -216,9 +235,11 @@ class KnuthFunc
                     runLength++;
                     Xj = Xj1;
                 }
+                //Xj = Xj1;
                 n++;
             }
-            printf("Number of Down Runs are %d\nAverage Run Length was %f\n", numRuns, ((float)avgl/(float)numRuns));
+            //printf("Number of Down Runs are %d\nAverage Run Length was %f\n", numRuns, ((float)avgl/(float)numRuns));
+            out << "Number of Down Runs are "<< numRuns << "\nAverage Run Length was " << ((float)avgl/(float)numRuns) << "\n";
             streamReset(ciphertxt);
             return true;
         }
@@ -232,7 +253,7 @@ class KnuthFunc
         //Dr. Hammer used something like this to find the distribution of integers when reduced by mod 26,
         //So not a bad idea to do the same on mine but get the average for that distribution.
         //Need to modify
-        float modReducTest(ifstream& s, int m)
+        float modReducTest(ifstream& s, int m, ofstream& out)
         {
             int x;
             int n = 0;
@@ -257,11 +278,12 @@ class KnuthFunc
 
             bool result = chiSquare(arr, m, n, 0);
             bool result2 = chiSquare(arr, m, n, 1);
-            printf("Chi-Square even distribution: %d\nChi-Square English Language distribution: %d\n", result, result2);
+            //printf("Chi-Square even distribution: %d\nChi-Square English Language distribution: %d\n", result, result2);
+            out << "Chi-Square even distribution: "<< result << "\nChi-Square English Language distribution: " << result2 << "\n";
             return avg;
         }
         //Right keeps track of how many times each digit appears on a ciphertext and also prints average digit.
-        void digitFrequencyTest(ifstream& s)
+        void digitFrequencyTest(ifstream& s, ofstream& out)
         {
             int digitArr[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             int x, a, g;
@@ -278,29 +300,58 @@ class KnuthFunc
                     n++;
                 }
             }
+            out << "Last digit chi-square result: " << chiSquare(digitArr, 9, n, 0) << "\n";
+            
             //print array loop
             for(int i = 0; i < 9; i++)
-                printf("Number of %ds are %d\n", i, digitArr[i]);
-            printf("Average Digit is %f\n", (avg/(float)n));
+                out << "All digits number of " << i <<"s are " << digitArr[i] << "\n";
+            //printf("Number of %ds are %d\n", i, digitArr[i]);
+            //printf("Average Digit is %f\n", (avg/(float)n));
+            out << "All digits average Digit is " << (avg/(float)n) << "\n";
+            streamReset(s);
+        }
+
+        void lastDigitFreq(ifstream& s, ofstream& out)
+        {
+            int digitArr[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            int x, a;
+            float avg = 0;
+            int n = 0;
+            while(s >> x){
+                a = x%10;
+                digitArr[a]++;
+                avg += a;
+                n++;
+            }
+            
+            out << "Last digit chi-square result: " << chiSquare(digitArr, 9, n, 0) << "\n";
+            for(int i = 0; i < 9; i++)
+                out << "Last digit number of " << i <<"s are " << digitArr[i] << "\n";
+            out << "Last digit average digit is " << (avg/(float)n) << "\n";
             streamReset(s);
         }
 
     public:
         //Runs all the tests and prints the results of each
-        bool testValidity(ifstream &s){
+        bool testValidity(ifstream &s, ofstream& out){
             //bool uRun = runUpTest(s);
-            int n = runUpTest(s);
-            bool dRun = runDownTest(s);
+            int n = runUpTest(s, out);
+            bool dRun = runDownTest(s, out);
             float dgap = avgDifTest(s);
-            printf("Average Gap between numbers is %f\n", dgap);
+            //printf("Average Gap between numbers is %f\n", dgap);
+            out << "Average Gap between numbers is " << dgap << "\n";
             float corrCoef = serialCorrTest(s);
-            printf("Correlation Coefficient is %f\n", corrCoef);
-            
-            float modRed = modReducTest(s, 26);
-            printf("Average Mod Reduction value is %f\n", modRed);
-            //digitFrequencyTest(s);
+            //printf("Correlation Coefficient is %f\n", corrCoef);
+            out << "Correlation Coefficient is " << corrCoef << "\n";
+            float modRed = modReducTest(s, 26, out);
+            //printf("Average Mod Reduction value is %f\n", modRed);
+            out << "Average Mod Reduction value is " << modRed << "\n";
+            digitFrequencyTest(s, out);
+            lastDigitFreq(s, out);
             bool ksRes = ksTest(s, n);
-            printf("ksTest pass = %d\n", ksRes);
+            //printf("ksTest pass = %d\n", ksRes);
+            out << "ksTest pass = " << ksRes << "\n";
+            printf("Tests Complete!\n");
             return true;
         }
 };
