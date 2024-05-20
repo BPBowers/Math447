@@ -1,3 +1,6 @@
+Total: 763
+Mean: 160.865
+Range: 1-1005
 Number of Up Runs are 263
 Average Run Length was 1.88973
 Number of Down Runs are 284

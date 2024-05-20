@@ -1,3 +1,6 @@
+Total: 115
+Mean: 843.322
+Range: 15-33125
 Number of Up Runs are 41
 Average Run Length was 1.80488
 Number of Down Runs are 41
@@ -7,14 +10,26 @@ Correlation Coefficient is -0.00229632
 Chi-Square even distribution: 0
 Chi-Square English Language distribution: 0
 Average Mod Reduction value is 12.4522
-Number of 0s are 27
-Number of 1s are 39
-Number of 2s are 41
-Number of 3s are 32
-Number of 4s are 26
-Number of 5s are 44
-Number of 6s are 40
-Number of 7s are 35
-Number of 8s are 29
-Average Digit is 4.5072
+Last digit chi-square result: 1
+All digits number of 0s are 27
+All digits number of 1s are 39
+All digits number of 2s are 41
+All digits number of 3s are 32
+All digits number of 4s are 26
+All digits number of 5s are 44
+All digits number of 6s are 40
+All digits number of 7s are 35
+All digits number of 8s are 29
+All digits average Digit is 4.5072
+Last digit chi-square result: 1
+Last digit number of 0s are 8
+Last digit number of 1s are 9
+Last digit number of 2s are 17
+Last digit number of 3s are 8
+Last digit number of 4s are 8
+Last digit number of 5s are 18
+Last digit number of 6s are 15
+Last digit number of 7s are 13
+Last digit number of 8s are 9
+Last digit average digit is 4.62609
 ksTest pass = 0

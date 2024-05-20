@@ -331,10 +331,37 @@ class KnuthFunc
             streamReset(s);
         }
 
+        void basicStats(ifstream& s, ofstream& out)
+        {
+            int temp, max, min;
+            int total = 1;
+            s >> max;
+            printf("Past 1\n");
+            min = max;
+            float mean = max;
+            while(s >> temp)
+            {
+                //printf("In loop\n");
+                mean += temp;
+                if(temp < min)
+                    min = temp;
+                else if (temp > max)
+                    max = temp;
+                total++;
+            }
+            mean /= total;
+            printf("Out of loop\n");
+            out << "Total: " << total << "\nMean: " << mean << "\nRange: " << min << "-" << max << "\n";
+            printf("Past output\n");
+            streamReset(s);
+        }
+
     public:
         //Runs all the tests and prints the results of each
         bool testValidity(ifstream &s, ofstream& out){
             //bool uRun = runUpTest(s);
+            basicStats(s, out);
+            printf("Out of stats\n");
             int n = runUpTest(s, out);
             bool dRun = runDownTest(s, out);
             float dgap = avgDifTest(s);

@@ -1,0 +1,35 @@
+Total: 75
+Mean: 12.3733
+Range: 1-25
+Number of Up Runs are 26
+Average Run Length was 1.80769
+Number of Down Runs are 27
+Average Run Length was 1.74074
+Average Gap between numbers is 7.90541
+Correlation Coefficient is 0.0843344
+Chi-Square even distribution: 0
+Chi-Square English Language distribution: 1
+Average Mod Reduction value is 12.3733
+Last digit chi-square result: 0
+All digits number of 0s are 9
+All digits number of 1s are 35
+All digits number of 2s are 17
+All digits number of 3s are 8
+All digits number of 4s are 8
+All digits number of 5s are 20
+All digits number of 6s are 1
+All digits number of 7s are 2
+All digits number of 8s are 10
+All digits average Digit is 3.41176
+Last digit chi-square result: 0
+Last digit number of 0s are 9
+Last digit number of 1s are 5
+Last digit number of 2s are 3
+Last digit number of 3s are 8
+Last digit number of 4s are 8
+Last digit number of 5s are 20
+Last digit number of 6s are 1
+Last digit number of 7s are 2
+Last digit number of 8s are 10
+Last digit average digit is 4.64
+ksTest pass = 0
